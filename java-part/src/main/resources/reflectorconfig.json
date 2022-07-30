@@ -1,0 +1,17 @@
+[
+  {
+    "name": "model.GameStep",
+    "allPublicFields" : true,
+    "allPublicConstructors" : true
+  },
+  {
+    "name": "model.NewGameParams",
+    "allPublicFields" : true,
+    "allPublicConstructors" : true
+  },
+  {
+    "name": "model.GameState",
+    "allPublicFields" : true,
+    "allPublicConstructors" : true
+  }
+]

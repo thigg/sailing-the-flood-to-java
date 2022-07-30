@@ -1,0 +1,20 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=flood-java
+Exec=flood-java
+Name=Sailing the flood to java
+# translation example:
+# your app name in German locale (de)
+#
+# Remember to comment out the following line, if you do not want to use
+# a different app name in German locale (de).
+#Name[de]=flood-java
+
+[X-Sailjail]
+# Replace with your organization as a reverse domain name
+OrganizationName=com.github.thigg
+# ApplicationName does not have to be identical to Name
+ApplicationName=flood-java
+# Add the required permissions here
+Permissions=
