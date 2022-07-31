@@ -15,7 +15,6 @@ TARGET = flood-java
 CONFIG += sailfishapp
 
 SOURCES += \
-    src/cbor.cpp \
     src/flood-java.cpp \
     src/gamepanel.cpp \
     src/gamestate.cpp \
@@ -48,7 +47,6 @@ HEADERS += \
     lib/sailfishjava.h \    
     lib/flatbuffers-2.0.0/include/flatbuffers/*.h \
     lib/flatbuffers-2.0.0/include/flatbuffers/pch/*.h \
-    src/cbor.h \
     src/gamestate_generated.h \
     src/gamepanel.h \
     src/gamestate.h \

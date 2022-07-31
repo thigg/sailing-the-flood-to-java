@@ -2,7 +2,6 @@
 #define GAMESTATE_H
 
 #include <QObject>
-#include "cbor.h"
 
 class QGameState: public QObject
 {
