@@ -1,16 +1,16 @@
 [
   {
-    "name": "model.GameStep",
+    "name": "Game.model.GameStep",
     "allPublicFields" : true,
     "allPublicConstructors" : true
   },
   {
-    "name": "model.NewGameParams",
+    "name": "Game.model.NewGameParams",
     "allPublicFields" : true,
     "allPublicConstructors" : true
   },
   {
-    "name": "model.GameState",
+    "name": "Game.model.GameState",
     "allPublicFields" : true,
     "allPublicConstructors" : true
   }

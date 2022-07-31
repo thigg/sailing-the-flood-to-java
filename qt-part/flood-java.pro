@@ -45,8 +45,11 @@ TRANSLATIONS += translations/java-qt-host-de.ts
 
 HEADERS += \
     lib/graal_isolate.h \
-    lib/sailfishjava.h \
+    lib/sailfishjava.h \    
+    lib/flatbuffers-2.0.0/include/flatbuffers/*.h \
+    lib/flatbuffers-2.0.0/include/flatbuffers/pch/*.h \
     src/cbor.h \
+    src/gamestate_generated.h \
     src/gamepanel.h \
     src/gamestate.h \
     src/jgateway.h
@@ -63,5 +66,6 @@ LIBS += -L$$PWD/lib/ -lsailfishjava
 
 INCLUDEPATH += $$PWD/../target
 INCLUDEPATH += $$PWD/lib
+INCLUDEPATH += $$PWD/lib/flatbuffers-2.0.0/include
 DEPENDPATH += $$PWD/../target
 DEPENDPATH += $$PWD/lib

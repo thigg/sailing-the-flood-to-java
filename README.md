@@ -8,14 +8,15 @@ Thus it tries to explore how usable native compiled shared java libraries are fo
 The fieldsize has been increased to 200x200 for fun, and to show performance
 
 ## Implementation notices
-The java part serializes the game state with cbor to transmit less data and sends it to the c++ part.
+The java part serializes the game state with flatbuffers to transmit less data and sends it to the c++ part.
+The flatbuffer definition is in `java-part/src/main/resources`.
+
 For performance reasons, the gamestate is directly parsed in c++ and the gamepanel is drawn from c++ as well.
 
 ## Future Plans / Ideas
 
 ### Technical
  - Save scores with sqlite
- - use protobuf instead of cbor
 
 ### Gameplay
  - Count scores
@@ -38,3 +39,8 @@ The java part needs to be built first. Adjust the [compile.sh script](java-part/
 You'll need the prequesits (graal native) on your phone. Cross compilation is not yet possible with graal native.
 
 Afterwards build the qt part with the sailfish ide. This links with the java part.
+
+## License
+With exceptions this project is public domain. Thus you can do with it whatever you want.
+The exceptions are:
+ - the original implementation of the game engine (Game.java) by Rhys Rustad-Elliott (MIT licensed)

@@ -23,16 +23,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
+
+import lombok.Value;
 
 /**
  * Class representing a game in progress.
  */
 public class Game {
-    private int board[][];
+    private short board[];
     private int boardSize;
 
     private int numColors;
@@ -63,15 +66,6 @@ public class Game {
         initMaxSteps();
     }
 
-    public Game(int[][] board, int boardSize, int numColors, int steps, String seed) {
-        // Restore board
-        this.board = board;
-        this.boardSize = boardSize;
-        this.numColors = numColors;
-        this.steps = steps;
-        this.seed = seed;
-        initMaxSteps();
-    }
 
     private String generateRandomSeed() {
         Random rand = new Random(System.currentTimeMillis());
@@ -82,13 +76,27 @@ public class Game {
         return currSeed;
     }
 
-    public int[][] getBoard() {
+    public short[] getBoard() {
         return board;
     }
 
-    public int getColor(int x, int y) {
-        return board[y][x];
+    public short getColor(int x, int y) {
+        return board[y*boardSize+x];
     }
+
+    private short getColor(final BoardPoint currPoint) {
+        return getColor(currPoint.getX(), currPoint.getY());
+    }
+
+    public void setColor(int x, int y, short color) {
+        board[y*boardSize+x] = color;
+    }
+
+
+    private void setColor(final BoardPoint currPoint, final short replacementColor) {
+        setColor(currPoint.getX(),currPoint.getY(),replacementColor);
+    }
+
 
     public int getBoardDimensions() {
         return boardSize;
@@ -107,72 +115,73 @@ public class Game {
     }
 
     private void initBoard() {
-        board = new int[boardSize][boardSize];
+        board = new short[boardSize*boardSize];
         Random r = new Random(seed.hashCode());
-        for (int y = 0; y < boardSize; y++) {
-            for (int x = 0; x < boardSize; x++) {
-                board[y][x] = r.nextInt(numColors);
-            }
+        final int[] ints = r.ints(boardSize * boardSize,0, numColors).toArray();
+        for (int i = 0; i < boardSize*boardSize; i++) {
+                board[i]  = (short) ints[i];
         }
-        return;
     }
 
     private void initMaxSteps() {
-        maxSteps = (int) 30 * (boardSize * numColors) / (17 * 6);
+        maxSteps = 30 * (boardSize * numColors) / (17 * 6);
     }
 
-    public void flood(int replacementColor) {
-        int targetColor = board[0][0];
+    public void flood(short replacementColor) {
+        short targetColor = getColor(0,0);
         if (targetColor == replacementColor) {
             return;
         }
 
         Queue<BoardPoint> queue = new LinkedList<BoardPoint>();
-        ArrayList<BoardPoint> processed = new ArrayList<BoardPoint>();
+        Set<BoardPoint> processed = new HashSet<>();
 
         queue.add(new BoardPoint(0, 0));
 
         BoardPoint currPoint;
         while (!queue.isEmpty()) {
             currPoint = queue.remove();
-            if (board[currPoint.getY()][currPoint.getX()] == targetColor) {
-                board[currPoint.getY()][currPoint.getX()] = replacementColor;
+            if (getColor(currPoint) == targetColor) {
+                setColor(currPoint, replacementColor);
+                final BoardPoint left = new BoardPoint(currPoint.getX() - 1, currPoint.getY());
                 if (currPoint.getX() != 0 &&
-                        !processed.contains(new BoardPoint(currPoint.getX() - 1, currPoint.getY()))) {
-                    queue.add(new BoardPoint(currPoint.getX() - 1, currPoint.getY()));
+                        !processed.contains(left)) {
+                    queue.add(left);
                 }
+                final BoardPoint right = new BoardPoint(currPoint.getX() + 1, currPoint.getY());
                 if (currPoint.getX() != boardSize - 1 &&
-                        !processed.contains(new BoardPoint(currPoint.getX() + 1, currPoint.getY()))) {
-                    queue.add(new BoardPoint(currPoint.getX() + 1, currPoint.getY()));
+                        !processed.contains(right)) {
+                    queue.add(right);
                 }
-                if (currPoint.getY() != 0 &&
-                        !processed.contains(new BoardPoint(currPoint.getX(), currPoint.getY() - 1))) {
+                final boolean below = currPoint.getY() != 0 &&
+                        !processed.contains(new BoardPoint(currPoint.getX(), currPoint.getY() - 1));
+                if (below) {
                     queue.add(new BoardPoint(currPoint.getX(), currPoint.getY() - 1));
                 }
+                final BoardPoint above = new BoardPoint(currPoint.getX(), currPoint.getY() + 1);
                 if (currPoint.getY() != boardSize - 1 &&
-                        !processed.contains(new BoardPoint(currPoint.getX(), currPoint.getY() + 1))) {
-                    queue.add(new BoardPoint(currPoint.getX(), currPoint.getY() + 1));
+                        !processed.contains(above)) {
+                    queue.add(above);
                 }
+                processed.add(currPoint);
             }
         }
         steps++;
-        return;
     }
 
+
     public boolean checkWin() {
-        int lastColor = board[0][0];
-        for (int y = 0; y < board.length; y++) {
-            for (int x = 0; x < board.length; x++) {
-                if (lastColor != board[y][x]) {
+        short lastColor = getColor(0,0);
+        for (final short b : board)
+                if (lastColor != b) {
                     return false;
                 }
-                lastColor = board[y][x];
-            }
-        }
+
         return true;
     }
 
-    private class BoardPoint {
+    @Value
+    private static class BoardPoint {
         int x, y;
 
         public BoardPoint(int x, int y) {
@@ -188,13 +197,5 @@ public class Game {
             return y;
         }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (!BoardPoint.class.isAssignableFrom(obj.getClass())) {
-                return false;
-            }
-            BoardPoint bp = (BoardPoint) obj;
-            return (this.x == bp.getX()) && (this.y == bp.getY());
-        }
     }
 }

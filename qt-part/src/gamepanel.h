@@ -11,16 +11,16 @@ class GamePanel : public QQuickPaintedItem
 {
     Q_OBJECT
 
-    Q_PROPERTY(GameState* gameState READ getGameState WRITE setGameState);
+    Q_PROPERTY(QGameState* gameState READ getGameState WRITE setGameState);
     //Q_PROPERTY(QVector<QColor> colors MEMBER m_colors);
 public:
     GamePanel();
     void paint(QPainter* painter);
-    void setGameState(GameState* state);
-    GameState* getGameState();
+    void setGameState(QGameState* state);
+    QGameState* getGameState();
 
 private:
-    GameState* m_gameState = nullptr;
+    QGameState* m_gameState = nullptr;
     QVector<QColor> m_colors;
 };
 

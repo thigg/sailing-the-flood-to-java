@@ -12,24 +12,23 @@ void GamePanel::paint(QPainter* painter){
     }
 
     std::vector<QColor> colors{QColor("#fbe7c6"), QColor("#b4f8c8"), QColor("#a0e7e5"),QColor( "#ffaebc")};
-    int y=0;
-    int tilesize = this->width() / m_gameState->field.size();
-    for (const std::vector<GameState::fieldValue> &row: m_gameState->field){
-        int x = 0;
-        for (const short fieldValue: row){
-            painter->fillRect(x*tilesize,y*tilesize,tilesize,tilesize,colors.at(fieldValue));
-            x++;
+
+    int tilesize = this->width() / m_gameState->m_fieldHeight;
+    for (int y = 0; y< m_gameState->m_fieldHeight;y++){
+        for (int x = 0; x <  m_gameState->m_fieldWidth; x++){
+            auto colorIndex =m_gameState->field.at(y* m_gameState->m_fieldWidth+x);
+           // if(colorIndex < colors.size())
+                painter->fillRect(x*tilesize,y*tilesize,tilesize,tilesize,colors.at(colorIndex));
         }
-        y++;
     }
 }
 
-void GamePanel::setGameState(GameState *state)
+void GamePanel::setGameState(QGameState *state)
 {
     m_gameState = state;
 }
 
-GameState *GamePanel::getGameState()
+QGameState *GamePanel::getGameState()
 {
     return m_gameState;
 }

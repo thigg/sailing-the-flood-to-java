@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     QScopedPointer<QQuickView> view(SailfishApp::createView());
 
     QQmlContext *context = view.data()->rootContext();
-    GameState gameState;
+    QGameState gameState;
     JGateway javaGateway(thread, &gameState);
 
 

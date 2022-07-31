@@ -10,15 +10,20 @@ Dialog {
 
         DialogHeader {}
 
+        // log-scaled
         Slider {
             id: gameSizeSlider
             label: qsTr("Game Tile Size")
             width: parent.width
-            minimumValue: 4
-            maximumValue: 200
-            value: 10
-            valueText: value + "×" + value
-            stepSize: 1
+            minimumValue: Math.log(4 * scale)
+            maximumValue: Math.log(352 * scale)
+            value: Math.log(10 * scale)
+            property int unLoggedValue: Math.round(Math.pow(Math.E,
+                                                            value) / scale)
+            property real scale: 1
+
+            valueText: unLoggedValue + "×" + unLoggedValue
+            stepSize: 0.01
         }
 
         Slider {
@@ -35,7 +40,7 @@ Dialog {
 
     onDone: {
         if (result == DialogResult.Accepted) {
-            gameSize = gameSizeSlider.value
+            gameSize = gameSizeSlider.unLoggedValue
             numColors = numColorsSlider.value
         }
     }

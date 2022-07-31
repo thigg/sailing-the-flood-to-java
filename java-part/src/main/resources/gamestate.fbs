@@ -1,0 +1,12 @@
+namespace Game.model;
+
+table GameState {
+  field:[short];
+  won: bool;
+  steps: int;
+  max_steps:int;
+  width: int;
+  height: int;
+}
+
+root_type GameState;

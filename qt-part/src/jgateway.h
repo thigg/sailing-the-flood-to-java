@@ -14,7 +14,7 @@ class JGateway: public QObject
     graal_isolatethread_t *thread;
     Q_OBJECT
 public:
-    JGateway(graal_isolatethread_t *thread, GameState *gameState);
+    JGateway(graal_isolatethread_t *thread, QGameState *gameState);
     Q_INVOKABLE void postMessage(const QString &qMethodName, const QString &msg);
 
 
@@ -23,7 +23,7 @@ signals:
 public slots:
 
 private:
-     GameState * m_gameState;
+     QGameState * m_gameState;
 
 };
 

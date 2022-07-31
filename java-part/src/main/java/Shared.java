@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.dataformat.cbor.databind.CBORMapper;
+import com.google.flatbuffers.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.graalvm.nativeimage.IsolateThread;
 import org.graalvm.nativeimage.UnmanagedMemory;
@@ -18,8 +18,7 @@ import org.graalvm.nativeimage.c.type.CTypeConversion;
 @Slf4j
 public class Shared {
 
-    static Map<String, Function<String, Object>> methods;
-    static ObjectMapper cborMapper = new CBORMapper();
+    static Map<String, Function<String, byte[]>> methods;
     static ObjectMapper jsonMapper = new JsonMapper();
 
 
@@ -38,18 +37,14 @@ public class Shared {
         final String methodName = CTypeConversion.toJavaString(methodNamePtr);
         final String message = CTypeConversion.toJavaString(messagePtr);
         if (methods.containsKey(methodName)) {
-            try {
-                final byte[] bytes = cborMapper.writeValueAsBytes(methods.get(methodName).apply(message));
-                final CCharPointer heapMem = UnmanagedMemory.malloc(bytes.length);
-                for(int i = 0; i< bytes.length; i++){
-                    heapMem.write(i, bytes[i]);
-                }
-                out.write(heapMem);
-                outSize.write(bytes.length);
-                log.info(cborMapper.reader().readTree(bytes).fieldNames().next());
-            } catch (IOException e) {
-                log.error("error creating json", e);
+
+            final byte[] bytes = methods.get(methodName).apply(message);
+            final CCharPointer heapMem = UnmanagedMemory.malloc(bytes.length);
+            for(int i = 0; i< bytes.length; i++){
+                heapMem.write(i, bytes[i]);
             }
+            out.write(heapMem);
+            outSize.write(bytes.length);
         } else {
             outSize.write(0);
             log.warn("was invoked with " + methodName + ", but this method is not known");

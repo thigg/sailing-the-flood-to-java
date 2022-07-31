@@ -4,7 +4,7 @@
 #include <QObject>
 #include "cbor.h"
 
-class GameState: public QObject
+class QGameState: public QObject
 {
 
     Q_OBJECT
@@ -13,13 +13,16 @@ class GameState: public QObject
     Q_PROPERTY( int steps READ getSteps NOTIFY stepsChanged);
     Q_PROPERTY( int maxSteps READ getMaxSteps NOTIFY maxStepsChanged);
 public:
-    typedef short fieldValue;
-    typedef std::vector<std::vector<fieldValue>> fieldType;
-    void load(const fieldType *field, bool won, int steps, int maxSteps);
+    typedef int16_t fieldValue;
+    typedef std::vector<fieldValue> fieldType;
+    void load(const fieldType *field,int width, int height, bool won, int steps, int maxSteps);
 
     bool getWon();
     int getSteps();
     int getMaxSteps();
+
+    int m_fieldHeight;
+    int m_fieldWidth;
     fieldType field = fieldType();
 
 signals:
