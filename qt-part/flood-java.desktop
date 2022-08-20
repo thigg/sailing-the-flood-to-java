@@ -3,7 +3,7 @@ Type=Application
 X-Nemo-Application-Type=silica-qt5
 Icon=flood-java
 Exec=flood-java
-Name=Sailing the flood to java
+Name=flood to java
 # translation example:
 # your app name in German locale (de)
 #
