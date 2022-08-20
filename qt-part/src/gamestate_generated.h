@@ -13,14 +13,23 @@ struct GameState;
 struct GameStateBuilder;
 struct GameStateT;
 
+struct Score;
+struct ScoreBuilder;
+struct ScoreT;
+
 struct GameStateT : public flatbuffers::NativeTable {
   typedef GameState TableType;
   std::vector<int16_t> field{};
   bool won = false;
-  int32_t steps = 0;
+  std::vector<int32_t> steps{};
   int32_t max_steps = 0;
   int32_t width = 0;
   int32_t height = 0;
+  std::vector<std::unique_ptr<Game::model::ScoreT>> scores{};
+  GameStateT() = default;
+  GameStateT(const GameStateT &o);
+  GameStateT(GameStateT&&) FLATBUFFERS_NOEXCEPT = default;
+  GameStateT &operator=(GameStateT o) FLATBUFFERS_NOEXCEPT;
 };
 
 struct GameState FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -32,7 +41,8 @@ struct GameState FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_STEPS = 8,
     VT_MAX_STEPS = 10,
     VT_WIDTH = 12,
-    VT_HEIGHT = 14
+    VT_HEIGHT = 14,
+    VT_SCORES = 16
   };
   const flatbuffers::Vector<int16_t> *field() const {
     return GetPointer<const flatbuffers::Vector<int16_t> *>(VT_FIELD);
@@ -40,8 +50,8 @@ struct GameState FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool won() const {
     return GetField<uint8_t>(VT_WON, 0) != 0;
   }
-  int32_t steps() const {
-    return GetField<int32_t>(VT_STEPS, 0);
+  const flatbuffers::Vector<int32_t> *steps() const {
+    return GetPointer<const flatbuffers::Vector<int32_t> *>(VT_STEPS);
   }
   int32_t max_steps() const {
     return GetField<int32_t>(VT_MAX_STEPS, 0);
@@ -52,8 +62,23 @@ struct GameState FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t height() const {
     return GetField<int32_t>(VT_HEIGHT, 0);
   }
+  const flatbuffers::Vector<flatbuffers::Offset<Game::model::Score>> *scores() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Game::model::Score>> *>(VT_SCORES);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
-    return true;
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_FIELD) &&
+           verifier.VerifyVector(field()) &&
+           VerifyField<uint8_t>(verifier, VT_WON, 1) &&
+           VerifyOffset(verifier, VT_STEPS) &&
+           verifier.VerifyVector(steps()) &&
+           VerifyField<int32_t>(verifier, VT_MAX_STEPS, 4) &&
+           VerifyField<int32_t>(verifier, VT_WIDTH, 4) &&
+           VerifyField<int32_t>(verifier, VT_HEIGHT, 4) &&
+           VerifyOffset(verifier, VT_SCORES) &&
+           verifier.VerifyVector(scores()) &&
+           verifier.VerifyVectorOfTables(scores()) &&
+           verifier.EndTable();
   }
   GameStateT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
   void UnPackTo(GameStateT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -70,8 +95,8 @@ struct GameStateBuilder {
   void add_won(bool won) {
     fbb_.AddElement<uint8_t>(GameState::VT_WON, static_cast<uint8_t>(won), 0);
   }
-  void add_steps(int32_t steps) {
-    fbb_.AddElement<int32_t>(GameState::VT_STEPS, steps, 0);
+  void add_steps(flatbuffers::Offset<flatbuffers::Vector<int32_t>> steps) {
+    fbb_.AddOffset(GameState::VT_STEPS, steps);
   }
   void add_max_steps(int32_t max_steps) {
     fbb_.AddElement<int32_t>(GameState::VT_MAX_STEPS, max_steps, 0);
@@ -81,6 +106,9 @@ struct GameStateBuilder {
   }
   void add_height(int32_t height) {
     fbb_.AddElement<int32_t>(GameState::VT_HEIGHT, height, 0);
+  }
+  void add_scores(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Game::model::Score>>> scores) {
+    fbb_.AddOffset(GameState::VT_SCORES, scores);
   }
   explicit GameStateBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -97,11 +125,13 @@ inline flatbuffers::Offset<GameState> CreateGameState(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::Vector<int16_t>> field = 0,
     bool won = false,
-    int32_t steps = 0,
+    flatbuffers::Offset<flatbuffers::Vector<int32_t>> steps = 0,
     int32_t max_steps = 0,
     int32_t width = 0,
-    int32_t height = 0) {
+    int32_t height = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<Game::model::Score>>> scores = 0) {
   GameStateBuilder builder_(_fbb);
+  builder_.add_scores(scores);
   builder_.add_height(height);
   builder_.add_width(width);
   builder_.add_max_steps(max_steps);
@@ -115,22 +145,133 @@ inline flatbuffers::Offset<GameState> CreateGameStateDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const std::vector<int16_t> *field = nullptr,
     bool won = false,
-    int32_t steps = 0,
+    const std::vector<int32_t> *steps = nullptr,
     int32_t max_steps = 0,
     int32_t width = 0,
-    int32_t height = 0) {
+    int32_t height = 0,
+    const std::vector<flatbuffers::Offset<Game::model::Score>> *scores = nullptr) {
   auto field__ = field ? _fbb.CreateVector<int16_t>(*field) : 0;
+  auto steps__ = steps ? _fbb.CreateVector<int32_t>(*steps) : 0;
+  auto scores__ = scores ? _fbb.CreateVector<flatbuffers::Offset<Game::model::Score>>(*scores) : 0;
   return Game::model::CreateGameState(
       _fbb,
       field__,
       won,
-      steps,
+      steps__,
       max_steps,
       width,
-      height);
+      height,
+      scores__);
 }
 
 flatbuffers::Offset<GameState> CreateGameState(flatbuffers::FlatBufferBuilder &_fbb, const GameStateT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct ScoreT : public flatbuffers::NativeTable {
+  typedef Score TableType;
+  int32_t player = 0;
+  int32_t steps = 0;
+  bool won = false;
+  int32_t combo_score = 0;
+};
+
+struct Score FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ScoreT NativeTableType;
+  typedef ScoreBuilder Builder;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_PLAYER = 4,
+    VT_STEPS = 6,
+    VT_WON = 8,
+    VT_COMBO_SCORE = 10
+  };
+  int32_t player() const {
+    return GetField<int32_t>(VT_PLAYER, 0);
+  }
+  int32_t steps() const {
+    return GetField<int32_t>(VT_STEPS, 0);
+  }
+  bool won() const {
+    return GetField<uint8_t>(VT_WON, 0) != 0;
+  }
+  int32_t combo_score() const {
+    return GetField<int32_t>(VT_COMBO_SCORE, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_PLAYER, 4) &&
+           VerifyField<int32_t>(verifier, VT_STEPS, 4) &&
+           VerifyField<uint8_t>(verifier, VT_WON, 1) &&
+           VerifyField<int32_t>(verifier, VT_COMBO_SCORE, 4) &&
+           verifier.EndTable();
+  }
+  ScoreT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ScoreT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Score> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScoreT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ScoreBuilder {
+  typedef Score Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_player(int32_t player) {
+    fbb_.AddElement<int32_t>(Score::VT_PLAYER, player, 0);
+  }
+  void add_steps(int32_t steps) {
+    fbb_.AddElement<int32_t>(Score::VT_STEPS, steps, 0);
+  }
+  void add_won(bool won) {
+    fbb_.AddElement<uint8_t>(Score::VT_WON, static_cast<uint8_t>(won), 0);
+  }
+  void add_combo_score(int32_t combo_score) {
+    fbb_.AddElement<int32_t>(Score::VT_COMBO_SCORE, combo_score, 0);
+  }
+  explicit ScoreBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Score> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Score>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Score> CreateScore(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t player = 0,
+    int32_t steps = 0,
+    bool won = false,
+    int32_t combo_score = 0) {
+  ScoreBuilder builder_(_fbb);
+  builder_.add_combo_score(combo_score);
+  builder_.add_steps(steps);
+  builder_.add_player(player);
+  builder_.add_won(won);
+  return builder_.Finish();
+}
+
+flatbuffers::Offset<Score> CreateScore(flatbuffers::FlatBufferBuilder &_fbb, const ScoreT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+inline GameStateT::GameStateT(const GameStateT &o)
+      : field(o.field),
+        won(o.won),
+        steps(o.steps),
+        max_steps(o.max_steps),
+        width(o.width),
+        height(o.height) {
+  scores.reserve(o.scores.size());
+  for (const auto &v : o.scores) { scores.emplace_back((v) ? new Game::model::ScoreT(*v) : nullptr); }
+}
+
+inline GameStateT &GameStateT::operator=(GameStateT o) FLATBUFFERS_NOEXCEPT {
+  std::swap(field, o.field);
+  std::swap(won, o.won);
+  std::swap(steps, o.steps);
+  std::swap(max_steps, o.max_steps);
+  std::swap(width, o.width);
+  std::swap(height, o.height);
+  std::swap(scores, o.scores);
+  return *this;
+}
 
 inline GameStateT *GameState::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::unique_ptr<GameStateT>(new GameStateT());
@@ -143,10 +284,11 @@ inline void GameState::UnPackTo(GameStateT *_o, const flatbuffers::resolver_func
   (void)_resolver;
   { auto _e = field(); if (_e) { _o->field.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->field[_i] = _e->Get(_i); } } }
   { auto _e = won(); _o->won = _e; }
-  { auto _e = steps(); _o->steps = _e; }
+  { auto _e = steps(); if (_e) { _o->steps.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->steps[_i] = _e->Get(_i); } } }
   { auto _e = max_steps(); _o->max_steps = _e; }
   { auto _e = width(); _o->width = _e; }
   { auto _e = height(); _o->height = _e; }
+  { auto _e = scores(); if (_e) { _o->scores.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { if(_o->scores[_i]) { _e->Get(_i)->UnPackTo(_o->scores[_i].get(), _resolver); } else { _o->scores[_i] = std::unique_ptr<Game::model::ScoreT>(_e->Get(_i)->UnPack(_resolver)); }; } } }
 }
 
 inline flatbuffers::Offset<GameState> GameState::Pack(flatbuffers::FlatBufferBuilder &_fbb, const GameStateT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -159,10 +301,11 @@ inline flatbuffers::Offset<GameState> CreateGameState(flatbuffers::FlatBufferBui
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const GameStateT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _field = _o->field.size() ? _fbb.CreateVector(_o->field) : 0;
   auto _won = _o->won;
-  auto _steps = _o->steps;
+  auto _steps = _o->steps.size() ? _fbb.CreateVector(_o->steps) : 0;
   auto _max_steps = _o->max_steps;
   auto _width = _o->width;
   auto _height = _o->height;
+  auto _scores = _o->scores.size() ? _fbb.CreateVector<flatbuffers::Offset<Game::model::Score>> (_o->scores.size(), [](size_t i, _VectorArgs *__va) { return CreateScore(*__va->__fbb, __va->__o->scores[i].get(), __va->__rehasher); }, &_va ) : 0;
   return Game::model::CreateGameState(
       _fbb,
       _field,
@@ -170,7 +313,43 @@ inline flatbuffers::Offset<GameState> CreateGameState(flatbuffers::FlatBufferBui
       _steps,
       _max_steps,
       _width,
-      _height);
+      _height,
+      _scores);
+}
+
+inline ScoreT *Score::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::unique_ptr<ScoreT>(new ScoreT());
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Score::UnPackTo(ScoreT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = player(); _o->player = _e; }
+  { auto _e = steps(); _o->steps = _e; }
+  { auto _e = won(); _o->won = _e; }
+  { auto _e = combo_score(); _o->combo_score = _e; }
+}
+
+inline flatbuffers::Offset<Score> Score::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ScoreT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateScore(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Score> CreateScore(flatbuffers::FlatBufferBuilder &_fbb, const ScoreT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ScoreT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _player = _o->player;
+  auto _steps = _o->steps;
+  auto _won = _o->won;
+  auto _combo_score = _o->combo_score;
+  return Game::model::CreateScore(
+      _fbb,
+      _player,
+      _steps,
+      _won,
+      _combo_score);
 }
 
 inline const Game::model::GameState *GetGameState(const void *buf) {

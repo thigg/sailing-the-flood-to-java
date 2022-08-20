@@ -4,6 +4,7 @@ import Sailfish.Silica 1.0
 Dialog {
     property int gameSize
     property int numColors
+    property bool multiplayer
 
     Column {
         width: parent.width
@@ -13,10 +14,10 @@ Dialog {
         // log-scaled
         Slider {
             id: gameSizeSlider
-            label: qsTr("Game Tile Size")
+            label: qsTr("Game Size")
             width: parent.width
             minimumValue: Math.log(4 * scale)
-            maximumValue: Math.log(352 * scale)
+            maximumValue: Math.log(250 * scale)
             value: Math.log(10 * scale)
             property int unLoggedValue: Math.round(Math.pow(Math.E,
                                                             value) / scale)
@@ -36,12 +37,19 @@ Dialog {
             stepSize: 1
             valueText: value
         }
+
+        TextSwitch {
+            id: multiplayerSwitch
+            text: qsTr("Enable 2 Player Mode")
+            checked: false
+        }
     }
 
     onDone: {
         if (result == DialogResult.Accepted) {
             gameSize = gameSizeSlider.unLoggedValue
             numColors = numColorsSlider.value
+            multiplayer = multiplayerSwitch.checked
         }
     }
 }

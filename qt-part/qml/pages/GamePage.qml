@@ -6,21 +6,36 @@ Page {
     id: page
 
     // The effective value will be restricted by ApplicationWindow.allowedOrientations
-    allowedOrientations: Orientation.All
+    allowedOrientations: Orientation.Portrait
 
     property var floodColorsCollection: ["#fbe7c6", "#b4f8c8", "#a0e7e5", "#ffaebc"]
     property var floodColors: floodColorsCollection
     property int gameSize: 5
+    property bool multiplayer: false
+
+    property int lastColor: -1
+    property int lastPlayer: -1
 
     Connections {
         target: GameState
     }
 
     function startNewGame() {
+        lastColor = -1
+        lastPlayer = -1
         JGateway.postMessage("startGame", JSON.stringify({
                                                              "size": gameSize,
                                                              "numColors": floodColors.length
                                                          }))
+    }
+
+    function flood(index, player) {
+        lastColor = index
+        lastPlayer = player
+        JGateway.postMessage("flood", JSON.stringify({
+                                                         "color": index,
+                                                         "player": player
+                                                     }))
     }
 
     Component.onCompleted: {
@@ -48,57 +63,56 @@ Page {
                         gameSize = dialog.gameSize
                         floodColors = floodColorsCollection.slice(
                                     0, dialog.numColors)
+                        multiplayer = dialog.multiplayer
                         startNewGame()
                     })
                 }
             }
         }
 
-        contentHeight: column.height
-
-        Column {
-            id: column
-
-            width: page.width
-            anchors.verticalCenter: parent.verticalCenter
-            spacing: Theme.paddingLarge
-            PageHeader {
-                title: qsTr("Open Flood")
+        PushUpMenu {
+            MenuItem {
+                text: qsTr("About")
+                onClicked: {
+                    Qt.openUrlExternally(
+                                "https://github.com/thigg/sailing-the-flood-to-java")
+                }
             }
-            Label {
-                text: GameState.won ? qsTr("You won in %1 moves").arg(
-                                          GameState.steps) : qsTr(
-                                          "Steps: %1/%2").arg(
-                                          GameState.steps).arg(
-                                          GameState.maxSteps)
+        }
+
+        Item {
+            anchors.fill: parent
+
+            PlayerControl {
+                id: secondPlayerControl
+                playerId: 1
+                y: ((parent.height - gamePanel.height) / 4) - (height / 2)
+                visible: multiplayer
+            }
+            PlayerScore {
+                anchors.top: secondPlayerControl.bottom
+                rotation: 180
+                playerId: 1
+                visible: multiplayer
             }
 
             GamePanel {
                 id: gamePanel
                 x: Theme.paddingLarge
+                anchors.centerIn: parent
                 width: parent.width - Theme.paddingLarge * 2
                 height: width
             }
 
-            Grid {
-                columns: 4
-                height: Theme.fontSizeExtraLarge * 2
-                width: page.width - Theme.paddingLarge * 2
-                x: Theme.paddingLarge
-                spacing: 4
-                Repeater {
-                    model: floodColors.length
-                    Button {
-                        height: parent.height
-                        width: parent.width / floodColors.length
-                        backgroundColor: floodColors[index]
+            PlayerScore {
+                anchors.bottom: firstPlayerControl.top
+                playerId: 0
+            }
 
-                        onClicked: JGateway.postMessage("flood",
-                                                        JSON.stringify({
-                                                                           "color": index
-                                                                       }))
-                    }
-                }
+            PlayerControl {
+                id: firstPlayerControl
+                playerId: 0
+                y: parent.height - ((parent.height - gamePanel.height) / 4) - (height / 2)
             }
         }
     }

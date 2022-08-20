@@ -27,8 +27,14 @@ DISTFILES += \
     qml/flood-java.qml \
     qml/pages/GamePage.qml \
     qml/pages/NewGameDialog.qml \
-    qml/pages/About.qml \
-    translations/*.ts
+    qml/pages/PlayerControl.qml \
+    qml/pages/PlayerScore.qml \
+    src/Game/model/GameState.java \
+    src/Game/model/GameStateT.java \
+    src/Game/model/Score.java \
+    src/Game/model/ScoreT.java \
+    translations/*.ts \
+    translations/java-qt-host-en.ts
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
@@ -36,17 +42,20 @@ SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 # following CONFIG line
 CONFIG += sailfishapp_i18n
 
+OTHER_FILES += rpm/flood-java.changes\
+rpm/flood-java.spec
+
 # German translation is enabled as an example. If you aren't
 # planning to localize your app, remember to comment out the
 # following TRANSLATIONS line. And also do not forget to
 # modify the localized app name in the the .desktop file.
-TRANSLATIONS += translations/java-qt-host-de.ts
+TRANSLATIONS += translations/flood-java-de.ts translations/flood-java-en.ts
 
 HEADERS += \
     lib/graal_isolate.h \
-    lib/sailfishjava.h \    
-    lib/flatbuffers-2.0.0/include/flatbuffers/*.h \
-    lib/flatbuffers-2.0.0/include/flatbuffers/pch/*.h \
+    lib/sailfishjava.h \
+    lib/flatbuffers/*.h \
+    lib/flatbuffers/pch/*.h \
     src/gamestate_generated.h \
     src/gamepanel.h \
     src/gamestate.h \
@@ -64,6 +73,5 @@ LIBS += -L$$PWD/lib/ -lsailfishjava
 
 INCLUDEPATH += $$PWD/../target
 INCLUDEPATH += $$PWD/lib
-INCLUDEPATH += $$PWD/lib/flatbuffers-2.0.0/include
 DEPENDPATH += $$PWD/../target
 DEPENDPATH += $$PWD/lib

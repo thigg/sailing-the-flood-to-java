@@ -21,17 +21,23 @@ JGateway::JGateway(graal_isolatethread_t *threadPtr, QGameState *gameStatePtr) {
 
 
 void JGateway::postMessage(const QString &qMethodName, const QString &msg) {
-    qDebug() << "Called the C++ method with" << msg;
     char *result;
     int result_len;
     JGateway__invoke(thread, qMethodName.toUtf8().data(), msg.toUtf8().data(), &result, &result_len);
+
+    qDebug() << "java returned";
+
     auto gamestate = Game::model::UnPackGameState(result);
+    qDebug()<< "unpacked gamestate, loading...";
+
 
     m_gameState->load( &gamestate->field,
                        gamestate->width,
                        gamestate->height,
-                      gamestate->won, gamestate->steps,
-                     gamestate->max_steps);
+                       gamestate->won, gamestate->steps,
+                       gamestate->max_steps,
+                       &gamestate->scores
+                      );
     delete result;
     emit invocationResult();
 

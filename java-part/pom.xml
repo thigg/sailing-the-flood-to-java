@@ -70,7 +70,7 @@
 
     <profiles>
         <profile>
-            <id>nativeFast</id>
+            <id>native</id>
             <build>
                 <plugins>
                     <plugin>

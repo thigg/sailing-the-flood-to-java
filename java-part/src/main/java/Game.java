@@ -23,13 +23,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.sun.source.tree.Tree;
+import lombok.Getter;
 import lombok.Value;
+import lombok.With;
 
 /**
  * Class representing a game in progress.
@@ -43,22 +54,36 @@ public class Game {
     private int steps = 0;
     private int maxSteps;
 
+    record Score(int player, int steps, int comboScore) {
+    }
+
+    @Getter
+    private final HashMap<Integer, Score> scores = new HashMap<>();
+
     private String seed;
     private static final String SEED_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
     private static final int SEED_LENGTH_LOWER = 5;
     private static final int SEED_LENGTH_UPPER = 15;
 
     public Game(int boardSize, int numColors) {
-        // Initialize board
-        this.boardSize = boardSize;
-        this.numColors = numColors;
-        this.seed = generateRandomSeed();
-        initBoard();
-        initMaxSteps();
+        this(boardSize, numColors, generateRandomSeed());
     }
 
+    public Game(int boardSize, int numColors, short[] _board) {
+        this(boardSize, numColors);
+        if (board.length != boardSize * boardSize) {
+            throw new IllegalArgumentException("invalid boardsize");
+        }
+        for (final short i : _board) {
+            if (i >= numColors || i < 0) {
+                throw new IllegalArgumentException("invalid color: " + i);
+            }
+        }
+        board = _board;
+    }
+
+
     public Game(int boardSize, int numColors, String seed) {
-        // Initialize board
         this.boardSize = boardSize;
         this.numColors = numColors;
         this.seed = seed;
@@ -67,7 +92,7 @@ public class Game {
     }
 
 
-    private String generateRandomSeed() {
+    private static String generateRandomSeed() {
         Random rand = new Random(System.currentTimeMillis());
         String currSeed = "";
         for (int i = 0; i < rand.nextInt((SEED_LENGTH_UPPER - SEED_LENGTH_LOWER) + 1) + SEED_LENGTH_LOWER; i++) {
@@ -81,20 +106,20 @@ public class Game {
     }
 
     public short getColor(int x, int y) {
-        return board[y*boardSize+x];
+        return board[y * boardSize + x];
     }
 
     private short getColor(final BoardPoint currPoint) {
-        return getColor(currPoint.getX(), currPoint.getY());
+        return getColor(currPoint.x(), currPoint.y());
     }
 
     public void setColor(int x, int y, short color) {
-        board[y*boardSize+x] = color;
+        board[y * boardSize + x] = color;
     }
 
 
     private void setColor(final BoardPoint currPoint, final short replacementColor) {
-        setColor(currPoint.getX(),currPoint.getY(),replacementColor);
+        setColor(currPoint.x(), currPoint.y(), replacementColor);
     }
 
 
@@ -115,11 +140,11 @@ public class Game {
     }
 
     private void initBoard() {
-        board = new short[boardSize*boardSize];
+        board = new short[boardSize * boardSize];
         Random r = new Random(seed.hashCode());
-        final int[] ints = r.ints(boardSize * boardSize,0, numColors).toArray();
-        for (int i = 0; i < boardSize*boardSize; i++) {
-                board[i]  = (short) ints[i];
+        final int[] ints = r.ints(boardSize * boardSize, 0, numColors).toArray();
+        for (int i = 0; i < boardSize * boardSize; i++) {
+            board[i] = (short) ints[i];
         }
     }
 
@@ -127,75 +152,72 @@ public class Game {
         maxSteps = 30 * (boardSize * numColors) / (17 * 6);
     }
 
-    public void flood(short replacementColor) {
-        short targetColor = getColor(0,0);
+
+    private boolean pointInField(BoardPoint point) {
+        return point.x >= 0 && point.x < boardSize && point.y >= 0 && point.y < boardSize;
+    }
+
+    public void flood(short replacementColor, int player) {
+        final BoardPoint startField = player == 0 ? new BoardPoint(0, 0) : new BoardPoint(boardSize - 1, boardSize - 1);
+        short targetColor = getColor(startField);
         if (targetColor == replacementColor) {
             return;
         }
 
-        Queue<BoardPoint> queue = new LinkedList<BoardPoint>();
-        Set<BoardPoint> processed = new HashSet<>();
+        int newAcquired = 0; //make this exponential so higher combos give a higher score
 
-        queue.add(new BoardPoint(0, 0));
+        Queue<BoardPoint> queue = new LinkedList<>();
+        Set<BoardPoint> seen = new HashSet<>();
+        seen.add(startField);
+        queue.add(startField);
 
         BoardPoint currPoint;
         while (!queue.isEmpty()) {
             currPoint = queue.remove();
-            if (getColor(currPoint) == targetColor) {
+            boolean replaced = false;
+
+            if (getColor(currPoint) == replacementColor) {
+                newAcquired++;
+            } else if (getColor(currPoint) == targetColor) {
+                replaced = true;
                 setColor(currPoint, replacementColor);
-                final BoardPoint left = new BoardPoint(currPoint.getX() - 1, currPoint.getY());
-                if (currPoint.getX() != 0 &&
-                        !processed.contains(left)) {
-                    queue.add(left);
-                }
-                final BoardPoint right = new BoardPoint(currPoint.getX() + 1, currPoint.getY());
-                if (currPoint.getX() != boardSize - 1 &&
-                        !processed.contains(right)) {
-                    queue.add(right);
-                }
-                final boolean below = currPoint.getY() != 0 &&
-                        !processed.contains(new BoardPoint(currPoint.getX(), currPoint.getY() - 1));
-                if (below) {
-                    queue.add(new BoardPoint(currPoint.getX(), currPoint.getY() - 1));
-                }
-                final BoardPoint above = new BoardPoint(currPoint.getX(), currPoint.getY() + 1);
-                if (currPoint.getY() != boardSize - 1 &&
-                        !processed.contains(above)) {
-                    queue.add(above);
-                }
-                processed.add(currPoint);
             }
+            final boolean finalReplaced = replaced;
+            final BoardPoint left = new BoardPoint(currPoint.x() - 1, currPoint.y());
+            final BoardPoint right = new BoardPoint(currPoint.x() + 1, currPoint.y());
+            final BoardPoint below = new BoardPoint(currPoint.x(), currPoint.y() - 1);
+            final BoardPoint above = new BoardPoint(currPoint.x(), currPoint.y() + 1);
+            final List<BoardPoint> reachedPoints = Stream.of(left, right, above, below)
+                    .filter(this::pointInField)
+                    .filter(Predicate.not(seen::contains))
+                    .filter(p -> finalReplaced && getColor(p) == targetColor || getColor(p) == replacementColor)
+                    .toList();
+            queue.addAll(reachedPoints);
+            seen.addAll(reachedPoints);
         }
+        scores.putIfAbsent(player, new Score(player, 0, 0));
+        //hillariously complicating way of handling scores
+        scores.merge(player, new Score(player, 1, newAcquired * newAcquired),
+                (a, b) -> new Score(a.player, a.steps + b.steps, a.comboScore + b.comboScore));
         steps++;
     }
 
 
     public boolean checkWin() {
-        short lastColor = getColor(0,0);
+        short lastColor = getColor(0, 0);
         for (final short b : board)
-                if (lastColor != b) {
-                    return false;
-                }
+            if (lastColor != b) {
+                return false;
+            }
 
         return true;
     }
 
-    @Value
-    private static class BoardPoint {
-        int x, y;
+    public void flood(final int replacementColor, final int player) {
+        flood((short) replacementColor, player);
+    }
 
-        public BoardPoint(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        public int getX() {
-            return x;
-        }
-
-        public int getY() {
-            return y;
-        }
+    private record BoardPoint(int x, int y) {
 
     }
 }

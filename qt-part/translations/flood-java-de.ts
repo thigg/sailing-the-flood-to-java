@@ -12,7 +12,7 @@
     <name>GamePage</name>
     <message>
         <source>Start New Game</source>
-        <translation type="unfinished"></translation>
+        <translation>Neues Spiel starten</translation>
     </message>
     <message>
         <source>About</source>
@@ -23,11 +23,11 @@
     <name>NewGameDialog</name>
     <message>
         <source>Amount of Colors</source>
-        <translation type="unfinished"></translation>
+        <translation>#Spielfarben</translation>
     </message>
     <message>
         <source>Enable 2 Player Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>2-Spieler-Modus</translation>
     </message>
     <message>
         <source>Game Size</source>
@@ -38,11 +38,11 @@
     <name>PlayerScore</name>
     <message>
         <source>You won! </source>
-        <translation type="unfinished"></translation>
+        <translation>Gewonnen!</translation>
     </message>
     <message>
         <source>Steps: %1 ComboScore: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Züge: %1 ComboScore: %2</translation>
     </message>
 </context>
 </TS>

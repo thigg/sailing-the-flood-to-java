@@ -12,7 +12,7 @@ Summary:    open flood game implementation running java
 Version:    0.1
 Release:    1
 Group:      Qt/Qt
-License:    LICENSE
+License:    MIT/Public Domain
 URL:        github.com/thigg/sailing-the-flood-to-java
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9

@@ -22,37 +22,54 @@ public final class GameState extends Table {
   public ByteBuffer fieldAsByteBuffer() { return __vector_as_bytebuffer(4, 2); }
   public ByteBuffer fieldInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 4, 2); }
   public boolean won() { int o = __offset(6); return o != 0 ? 0!=bb.get(o + bb_pos) : false; }
-  public int steps() { int o = __offset(8); return o != 0 ? bb.getInt(o + bb_pos) : 0; }
+  public int steps(int j) { int o = __offset(8); return o != 0 ? bb.getInt(__vector(o) + j * 4) : 0; }
+  public int stepsLength() { int o = __offset(8); return o != 0 ? __vector_len(o) : 0; }
+  public IntVector stepsVector() { return stepsVector(new IntVector()); }
+  public IntVector stepsVector(IntVector obj) { int o = __offset(8); return o != 0 ? obj.__assign(__vector(o), bb) : null; }
+  public ByteBuffer stepsAsByteBuffer() { return __vector_as_bytebuffer(8, 4); }
+  public ByteBuffer stepsInByteBuffer(ByteBuffer _bb) { return __vector_in_bytebuffer(_bb, 8, 4); }
   public int maxSteps() { int o = __offset(10); return o != 0 ? bb.getInt(o + bb_pos) : 0; }
   public int width() { int o = __offset(12); return o != 0 ? bb.getInt(o + bb_pos) : 0; }
   public int height() { int o = __offset(14); return o != 0 ? bb.getInt(o + bb_pos) : 0; }
+  public Game.model.Score scores(int j) { return scores(new Game.model.Score(), j); }
+  public Game.model.Score scores(Game.model.Score obj, int j) { int o = __offset(16); return o != 0 ? obj.__assign(__indirect(__vector(o) + j * 4), bb) : null; }
+  public int scoresLength() { int o = __offset(16); return o != 0 ? __vector_len(o) : 0; }
+  public Game.model.Score.Vector scoresVector() { return scoresVector(new Game.model.Score.Vector()); }
+  public Game.model.Score.Vector scoresVector(Game.model.Score.Vector obj) { int o = __offset(16); return o != 0 ? obj.__assign(__vector(o), 4, bb) : null; }
 
   public static int createGameState(FlatBufferBuilder builder,
       int fieldOffset,
       boolean won,
-      int steps,
+      int stepsOffset,
       int maxSteps,
       int width,
-      int height) {
-    builder.startTable(6);
+      int height,
+      int scoresOffset) {
+    builder.startTable(7);
+    GameState.addScores(builder, scoresOffset);
     GameState.addHeight(builder, height);
     GameState.addWidth(builder, width);
     GameState.addMaxSteps(builder, maxSteps);
-    GameState.addSteps(builder, steps);
+    GameState.addSteps(builder, stepsOffset);
     GameState.addField(builder, fieldOffset);
     GameState.addWon(builder, won);
     return GameState.endGameState(builder);
   }
 
-  public static void startGameState(FlatBufferBuilder builder) { builder.startTable(6); }
+  public static void startGameState(FlatBufferBuilder builder) { builder.startTable(7); }
   public static void addField(FlatBufferBuilder builder, int fieldOffset) { builder.addOffset(0, fieldOffset, 0); }
   public static int createFieldVector(FlatBufferBuilder builder, short[] data) { builder.startVector(2, data.length, 2); for (int i = data.length - 1; i >= 0; i--) builder.addShort(data[i]); return builder.endVector(); }
   public static void startFieldVector(FlatBufferBuilder builder, int numElems) { builder.startVector(2, numElems, 2); }
   public static void addWon(FlatBufferBuilder builder, boolean won) { builder.addBoolean(1, won, false); }
-  public static void addSteps(FlatBufferBuilder builder, int steps) { builder.addInt(2, steps, 0); }
+  public static void addSteps(FlatBufferBuilder builder, int stepsOffset) { builder.addOffset(2, stepsOffset, 0); }
+  public static int createStepsVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addInt(data[i]); return builder.endVector(); }
+  public static void startStepsVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static void addMaxSteps(FlatBufferBuilder builder, int maxSteps) { builder.addInt(3, maxSteps, 0); }
   public static void addWidth(FlatBufferBuilder builder, int width) { builder.addInt(4, width, 0); }
   public static void addHeight(FlatBufferBuilder builder, int height) { builder.addInt(5, height, 0); }
+  public static void addScores(FlatBufferBuilder builder, int scoresOffset) { builder.addOffset(6, scoresOffset, 0); }
+  public static int createScoresVector(FlatBufferBuilder builder, int[] data) { builder.startVector(4, data.length, 4); for (int i = data.length - 1; i >= 0; i--) builder.addOffset(data[i]); return builder.endVector(); }
+  public static void startScoresVector(FlatBufferBuilder builder, int numElems) { builder.startVector(4, numElems, 4); }
   public static int endGameState(FlatBufferBuilder builder) {
     int o = builder.endTable();
     return o;
@@ -77,7 +94,8 @@ public final class GameState extends Table {
     _o.setField(_oField);
     boolean _oWon = won();
     _o.setWon(_oWon);
-    int _oSteps = steps();
+    int[] _oSteps = new int[stepsLength()];
+    for (int _j = 0; _j < stepsLength(); ++_j) {_oSteps[_j] = steps(_j);}
     _o.setSteps(_oSteps);
     int _oMaxSteps = maxSteps();
     _o.setMaxSteps(_oMaxSteps);
@@ -85,6 +103,9 @@ public final class GameState extends Table {
     _o.setWidth(_oWidth);
     int _oHeight = height();
     _o.setHeight(_oHeight);
+    Game.model.ScoreT[] _oScores = new Game.model.ScoreT[scoresLength()];
+    for (int _j = 0; _j < scoresLength(); ++_j) {_oScores[_j] = (scores(_j) != null ? scores(_j).unpack() : null);}
+    _o.setScores(_oScores);
   }
   public static int pack(FlatBufferBuilder builder, GameStateT _o) {
     if (_o == null) return 0;
@@ -92,14 +113,26 @@ public final class GameState extends Table {
     if (_o.getField() != null) {
       _field = createFieldVector(builder, _o.getField());
     }
+    int _steps = 0;
+    if (_o.getSteps() != null) {
+      _steps = createStepsVector(builder, _o.getSteps());
+    }
+    int _scores = 0;
+    if (_o.getScores() != null) {
+      int[] __scores = new int[_o.getScores().length];
+      int _j = 0;
+      for (Game.model.ScoreT _e : _o.getScores()) { __scores[_j] = Game.model.Score.pack(builder, _e); _j++;}
+      _scores = createScoresVector(builder, __scores);
+    }
     return createGameState(
       builder,
       _field,
       _o.getWon(),
-      _o.getSteps(),
+      _steps,
       _o.getMaxSteps(),
       _o.getWidth(),
-      _o.getHeight());
+      _o.getHeight(),
+      _scores);
   }
 }
 
