@@ -35,6 +35,15 @@ For performance reasons, the gamestate is directly parsed in c++ and the gamepan
  - field tiles that are harder to transform. e.g. switch color on first break
 
 ## Building
+### Prerequisites
+You'll need graalvm working on your phone. See [sailing-to-coffee](https://github.com/thigg/sailing-to-coffee) for further instructions.
+
+1. run `git submodule init` in this repo
+1. install  `pkcon install gcc glibc-devel zlib-devel libstdc++-static` to your aarch64 phone
+2. download graalvm to your phone
+
+### Building
+
 The java part needs to be built first. Adjust the [compile.sh script](java-part/compile.sh) to your needs.
 You'll need the prequesits (graal native) on your phone. Cross compilation is not yet possible with graal native.
 

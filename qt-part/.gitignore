@@ -1,4 +1,5 @@
-lib/
+lib/*.h
+lib/*.so
 rpm/*.in
 # C++ objects and libs
 
