@@ -61,6 +61,7 @@ The concrete implementation differs quite a lot, see implementation notes above 
  - development by me, Thilo Kogge
  - logo by miehl
  - original game by Rhys Rustad-Elliott (GunshipPenguin)
+ - flypig build testing
 
 
 ## License
