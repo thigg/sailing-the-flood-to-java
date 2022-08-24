@@ -10,7 +10,7 @@
 #   - translation filenames have to be changed
 
 # The name of your application
-TARGET = flood-java
+TARGET = harbour-flood-java
 
 CONFIG += sailfishapp
 
@@ -21,10 +21,10 @@ SOURCES += \
     src/jgateway.cpp
 
 DISTFILES += \
-    flood-java.desktop \
+    harbour-flood-java.desktop \
     lib/libjavafloodjava.so \
     qml/cover/CoverPage.qml \
-    qml/flood-java.qml \
+    qml/harbour-flood-java.qml \
     qml/pages/GamePage.qml \
     qml/pages/NewGameDialog.qml \
     qml/pages/PlayerControl.qml \
@@ -33,8 +33,8 @@ DISTFILES += \
     src/Game/model/GameStateT.java \
     src/Game/model/Score.java \
     src/Game/model/ScoreT.java \
-    translations/*.ts \
-    translations/java-qt-host-en.ts
+    translations/harbour-flood-java*.ts \
+    translations/java-qt-host-en.ts\
 
 SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 
@@ -42,10 +42,11 @@ SAILFISHAPP_ICONS = 86x86 108x108 128x128 172x172
 # following CONFIG line
 CONFIG += sailfishapp_i18n
 
-OTHER_FILES += rpm/flood-java.changes\
-rpm/flood-java.spec
+OTHER_FILES +=\
+    rpm/harbour-flood-java.changes \
+    rpm/harbour-flood-java.spec
 
-TRANSLATIONS += translations/flood-java-de.ts translations/flood-java-en.ts
+TRANSLATIONS += translations/harbour-flood-java-de.ts translations/harbour-flood-java-en.ts
 
 HEADERS += \
     lib/graal_isolate.h \
@@ -58,10 +59,10 @@ HEADERS += \
     src/jgateway.h
 
 javalib.files = $$PWD/lib/libjavafloodjava.so
-javalib.path = $$[QT_INSTALL_LIBS]
+javalib.path = /usr/share/harbour-flood-java/lib/
 
 INSTALLS += javalib
-LIBS += -L$$PWD/lib/ -ljavafloodjava
+LIBS += -L/$$PWD/lib/ -ljavafloodjava
 
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../target/release/ -lnativeimpl
 #else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../target/debug/ -lnativeimpl

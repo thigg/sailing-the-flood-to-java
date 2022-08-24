@@ -1,8 +1,8 @@
 [Desktop Entry]
 Type=Application
 X-Nemo-Application-Type=silica-qt5
-Icon=flood-java
-Exec=flood-java
+Icon=harbour-flood-java
+Exec=harbour-flood-java
 Name=Flood to Java
 # translation example:
 # your app name in German locale (de)
@@ -15,6 +15,6 @@ Name=Flood to Java
 # Replace with your organization as a reverse domain name
 OrganizationName=com.github.thigg
 # ApplicationName does not have to be identical to Name
-ApplicationName=flood-java
+ApplicationName=harbour-flood-java
 # Add the required permissions here
 Permissions=

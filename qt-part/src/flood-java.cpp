@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     context->setContextProperty("GameState", &gameState);
 
 
-    view->setSource(SailfishApp::pathTo("qml/flood-java.qml"));
+    view->setSource(SailfishApp::pathTo("qml/harbour-flood-java.qml"));
     view->show();
 
     return app->exec();
