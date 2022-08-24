@@ -5,7 +5,7 @@
 #endif
 
 #include <QtQuick>
-#include "../lib/sailfishjava.h"
+#include "../lib/javafloodjava.h"
 
 #include <cstring>
 #include <string>

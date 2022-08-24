@@ -22,7 +22,7 @@ SOURCES += \
 
 DISTFILES += \
     flood-java.desktop \
-    lib/libsailfishjava.so \
+    lib/libjavafloodjava.so \
     qml/cover/CoverPage.qml \
     qml/flood-java.qml \
     qml/pages/GamePage.qml \
@@ -45,27 +45,23 @@ CONFIG += sailfishapp_i18n
 OTHER_FILES += rpm/flood-java.changes\
 rpm/flood-java.spec
 
-# German translation is enabled as an example. If you aren't
-# planning to localize your app, remember to comment out the
-# following TRANSLATIONS line. And also do not forget to
-# modify the localized app name in the the .desktop file.
 TRANSLATIONS += translations/flood-java-de.ts translations/flood-java-en.ts
 
 HEADERS += \
     lib/graal_isolate.h \
-    lib/sailfishjava.h \
     lib/flatbuffers/*.h \
     lib/flatbuffers/pch/*.h \
+    lib/javafloodjava.h \
     src/gamestate_generated.h \
     src/gamepanel.h \
     src/gamestate.h \
     src/jgateway.h
 
-javalib.files = $$PWD/lib/libsailfishjava.so
+javalib.files = $$PWD/lib/libjavafloodjava.so
 javalib.path = $$[QT_INSTALL_LIBS]
 
 INSTALLS += javalib
-LIBS += -L$$PWD/lib/ -lsailfishjava
+LIBS += -L$$PWD/lib/ -ljavafloodjava
 
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../target/release/ -lnativeimpl
 #else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../target/debug/ -lnativeimpl

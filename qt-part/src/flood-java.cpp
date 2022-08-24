@@ -3,7 +3,7 @@
 #include <sailfishapp.h>
 #include <cstdio>
 #include "../lib/graal_isolate.h"
-#include "../lib/sailfishjava.h"
+#include "../lib/javafloodjava.h"
 #include "gamepanel.h"
 #include "src/jgateway.h"
 
