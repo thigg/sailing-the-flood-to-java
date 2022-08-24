@@ -4,8 +4,8 @@
 <context>
     <name>CoverPage</name>
     <message>
-        <source>flood</source>
-        <translation type="unfinished"></translation>
+        <source>Flood to Java</source>
+        <translation>Flood to Java</translation>
     </message>
 </context>
 <context>
