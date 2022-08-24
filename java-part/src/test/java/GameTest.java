@@ -1,3 +1,5 @@
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -5,10 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Slf4j
 public class GameTest {
-
-
-
     @Test
     public void testGame(){
         Game g  = new Game(3,4,"apple");
@@ -111,5 +111,20 @@ public class GameTest {
                 2, 2, 2},g.getBoard());
         assertTrue(g.checkWin());
 
+    }
+
+    @Test  @Disabled
+    public void performance(){
+        Game g = new Game(300,4);
+        int color = 0;
+        int steps = 0;
+        while(!g.checkWin())
+        {
+            g.flood(color,0);
+            color ++;
+            color %=4;
+            steps++;
+        }
+       log.info("steps {}",steps);
     }
 }

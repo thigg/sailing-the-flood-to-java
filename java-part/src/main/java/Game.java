@@ -23,24 +23,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import com.sun.source.tree.Tree;
 import lombok.Getter;
-import lombok.Value;
-import lombok.With;
 
 /**
  * Class representing a game in progress.
@@ -157,28 +146,32 @@ public class Game {
         return point.x >= 0 && point.x < boardSize && point.y >= 0 && point.y < boardSize;
     }
 
+
     public void flood(short replacementColor, int player) {
         final BoardPoint startField = player == 0 ? new BoardPoint(0, 0) : new BoardPoint(boardSize - 1, boardSize - 1);
-        short targetColor = getColor(startField);
+        final short targetColor = getColor(startField);
         if (targetColor == replacementColor) {
             return;
         }
 
         int newAcquired = 0; //make this exponential so higher combos give a higher score
 
-        Queue<BoardPoint> queue = new LinkedList<>();
-        Set<BoardPoint> seen = new HashSet<>();
-        seen.add(startField);
-        queue.add(startField);
+        record QueueItem(BoardPoint point, short color) {
+        }
+        final Queue<QueueItem> queue = new LinkedList<>();
+        final boolean[] seen = new boolean[board.length]; //default false
+        seen[startField.toArrayCoord(boardSize)] = true;
 
-        BoardPoint currPoint;
+        queue.add(new QueueItem(startField, getColor(startField)));
+
         while (!queue.isEmpty()) {
-            currPoint = queue.remove();
+            final QueueItem currItem = queue.remove();
+            final BoardPoint currPoint = currItem.point;
             boolean replaced = false;
 
-            if (getColor(currPoint) == replacementColor) {
+            if (currItem.color == replacementColor) {
                 newAcquired++;
-            } else if (getColor(currPoint) == targetColor) {
+            } else if (currItem.color == targetColor) {
                 replaced = true;
                 setColor(currPoint, replacementColor);
             }
@@ -187,13 +180,17 @@ public class Game {
             final BoardPoint right = new BoardPoint(currPoint.x() + 1, currPoint.y());
             final BoardPoint below = new BoardPoint(currPoint.x(), currPoint.y() - 1);
             final BoardPoint above = new BoardPoint(currPoint.x(), currPoint.y() + 1);
-            final List<BoardPoint> reachedPoints = Stream.of(left, right, above, below)
-                    .filter(this::pointInField)
-                    .filter(Predicate.not(seen::contains))
-                    .filter(p -> finalReplaced && getColor(p) == targetColor || getColor(p) == replacementColor)
-                    .toList();
-            queue.addAll(reachedPoints);
-            seen.addAll(reachedPoints);
+            for (BoardPoint p : Arrays.asList(left, right, above, below)) {
+                if (pointInField(p)) {
+                    if (!seen[p.toArrayCoord(boardSize)]) {
+                        final short color = getColor(p);
+                        if (finalReplaced && color == targetColor || color == replacementColor) {
+                            queue.add(new QueueItem(p, color));
+                            seen[p.toArrayCoord(boardSize)] = true;
+                        }
+                    }
+                }
+            }
         }
         scores.putIfAbsent(player, new Score(player, 0, 0));
         //hillariously complicating way of handling scores
@@ -217,7 +214,10 @@ public class Game {
         flood((short) replacementColor, player);
     }
 
-    private record BoardPoint(int x, int y) {
-
+    record BoardPoint(int x, int y) {
+        public int toArrayCoord(int boardSize) {
+            return x * boardSize + y;
+        }
     }
+
 }
