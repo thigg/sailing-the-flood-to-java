@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="qt-part/icons/86x86/flood-java.png" height="86">
+</p>
+
+
 # open flood for SFOS
 
 This is an open flood game implementation, inspired and with bits from [gunship_penguin](https://github.com/GunshipPenguin/open_flood).
@@ -51,6 +56,11 @@ Afterwards build the qt part with the sailfish ide. This links with the java par
 
 See [sailing-to-coffee](https://github.com/thigg/sailing-to-coffee) for further instructions.
 The concrete implementation differs quite a lot, see implementation notes above for that.
+
+## Credits
+ - development by me, Thilo Kogge
+ - logo by miehl
+ - original game by Rhys Rustad-Elliott (GunshipPenguin)
 
 
 ## License

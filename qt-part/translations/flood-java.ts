@@ -33,6 +33,10 @@
         <source>Game Size</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Rules: No rules! Press the buttons below, flood the field, enjoy the game.&lt;br&gt;The ComboScore is the square of your newly flooded fields.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>PlayerScore</name>

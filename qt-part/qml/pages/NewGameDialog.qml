@@ -11,6 +11,13 @@ Dialog {
 
         DialogHeader {}
 
+        Label {
+            width: parent.width
+            bottomPadding: Theme.paddingLarge
+            text: qsTr("Rules: No rules! Press the buttons below, flood the field, enjoy the game.<br>The ComboScore is the square of your newly flooded fields.")
+            wrapMode: Text.WordWrap
+        }
+
         // log-scaled
         Slider {
             id: gameSizeSlider

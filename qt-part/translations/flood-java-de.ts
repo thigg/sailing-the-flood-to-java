@@ -16,7 +16,7 @@
     </message>
     <message>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>Über</translation>
     </message>
 </context>
 <context>
@@ -31,7 +31,11 @@
     </message>
     <message>
         <source>Game Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Feldgröße</translation>
+    </message>
+    <message>
+        <source>Rules: No rules! Press the buttons below, flood the field, enjoy the game.&lt;br&gt;The ComboScore is the square of your newly flooded fields.</source>
+        <translation>Regeln: keine Regeln. Unter dem Spielfeld sind Knöpfe. Flute das Feld.&lt;br&gt;Die ComboScore ist das Quadrat deiner frisch gefluteten Felder.</translation>
     </message>
 </context>
 <context>
