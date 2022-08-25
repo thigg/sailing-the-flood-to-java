@@ -10,7 +10,7 @@ This is an open flood game implementation, inspired and with bits from [GunshipP
 This game is mainly a tech demo of [sailing-to-coffee](https://github.com/thigg/sailing-to-coffee).
 Thus it tries to explore how usable native compiled shared java libraries are for SailfishOS applications.
 
-The fieldsize has been increased to 250x250 for fun, and to show performance
+The maximum fieldsize has been increased to 250x250 for fun, and to show performance
 
 ## Implementation notices
 The java part serializes the game state with flatbuffers to transmit less data and sends it to the c++ part.
