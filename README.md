@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="qt-part/icons/172x172/flood-java.png" height="172">
+  <img src="qt-part/icons/172x172/harbour-flood-java.png" height="172">
 </p>
 
 
