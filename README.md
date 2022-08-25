@@ -5,7 +5,7 @@
 
 # open flood for SFOS
 
-This is an open flood game implementation, inspired and with bits from [gunship_penguin](https://github.com/GunshipPenguin/open_flood).
+This is an open flood game implementation, inspired and with bits from [GunshipPenguin](https://github.com/GunshipPenguin/open_flood).
 
 This game is mainly a tech demo of [sailing-to-coffee](https://github.com/thigg/sailing-to-coffee).
 Thus it tries to explore how usable native compiled shared java libraries are for SailfishOS applications.
