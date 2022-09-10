@@ -46,7 +46,7 @@
     </message>
     <message>
         <source>Steps: %1 ComboScore: %2</source>
-        <translation>Steg: %1 Kombinationspoäng: %2</translation>
+        <translation>Steg: %1 Kombo-poäng: %2</translation>
     </message>
 </context>
 </TS>
