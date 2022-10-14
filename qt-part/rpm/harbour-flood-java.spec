@@ -11,7 +11,7 @@ Name:       harbour-flood-java
 # << macros
 
 Summary:    open flood game implementation running java
-Version:    0.1
+Version:    0.1.1
 Release:    1
 Group:      Qt/Qt
 License:    MIT/Public Domain
